@@ -1,1 +1,61 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miscellaneous stuff</title>
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/bootswatch/3.1.1/spacelab/bootstrap.min.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="page-header">
+<h1>Random thoughts <small>Collection of unrelated material</small></h1>
+</div>
+
+<div class="row">
+
+<section class="col-md-6 col-sm-12">
+<h2>luarocks 2.0.13 for Debian</h2>
+<p><small>Wed, 18 Jun 2014 22:44:54 +0200</small></p>
+<p>
+Lately I am working quite intensively with the <a href="http://www.lua.org/">Lua</a>
+programming language. I will have to deploy the final system on different linux
+distros, mostly <a href="http://www.debian.org/">Debian</a> 7 (Wheezy) 64 bits, so I
+decided to install it together with the Lua packages it depends on by leveraging the
+natural deployment system provided by the Lua ecosystem, that is
+<a href="http://www.luarocks.org/">LuaRocks</a>.
+</p>
+<p>
+In short: the official LuaRocks package found in Debian repositories is 2.0.9 and it
+has a bug that prevented me to use it successfully. I rebuilt and packaged LuaRocks
+for Debian Wheezy using the latest compatible release (2.0.13) leaving almost all the
+old settings but depending on Lua 5.2 instead of Lua 5.1. Hopefully it will be usefull
+to others.
+</p>
+<p>
+<div class="pull-right">
+<a class="btn btn-lg btn-success" href="assets/luarocks_2.0.13-1_all.deb"><span class="glyphicon glyphicon-download icon-white"></span> Download</a>
+</div>
+</p>
+</section>
+
+</div>
+
+<footer class="row">
+<hr>
+<p>
+Copyright © Fontana Nicola &mdash; Original information presented on this website,
+unless otherwise indicated, should be considered in the public domain.
+</p>
+</footer>
+
+</div>
+
+</html>
