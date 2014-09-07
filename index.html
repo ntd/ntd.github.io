@@ -46,7 +46,47 @@
 
 <div class="row">
 
-<section class="col-md-6 col-sm-12">
+<div class="col-md-8">
+
+<section class="clearfix" id="cycle-optimization">
+<h2>Optimization of array cycles in Lua</h2>
+<p><small>Sun, 07 Sep 2014 09:35:41 +0200</small></p>
+<p>
+A common pattern is to use Lua tables as arrays: there is no other data structure so
+the choice is imposed. This does not usually pose any problem apart the fact you
+cannot store <a href="http://lua-users.org/wiki/StoringNilsInTables"><code>nil</code>
+values in tables</a> blindly.
+</p>
+
+<p>
+However, when populating with millions of items, using Lua tables becomes a
+performance issue because the length operator has <b>O(n)</b> complexity.
+<code>table.insert</code>, the obvious candidate for such operation, has the worse
+performance. Directly using <code>v[#v+1]</code> avoids a call but still suffers from
+the O(n) problem. The proper solution is to avoid relying on the lengh operator by
+keeping a separate pointer or directly use the iterator variable of the cycle.
+</p>
+
+<pre>
+$ time lua -e 'a = {} for n = 1, 10000000 do table.insert(a, n) end'
+
+real    0m3.218s
+user    0m3.173s
+sys 0m0.040s
+$ time lua -e 'a = {} for n = 1, 10000000 do a[#a+1] = n end'
+
+real    0m2.656s
+user    0m2.623s
+sys 0m0.027s
+$ time lua -e 'a = {} for n = 1, 10000000 do a[n] = n end'
+
+real    0m0.435s
+user    0m0.403s
+sys 0m0.027s
+</pre>
+</section>
+
+<section class="clearfix" id="luarocks-debian">
 <h2>luarocks 2.0.13 for Debian</h2>
 <p><small>Wed, 18 Jun 2014 22:44:54 +0200</small></p>
 <p>
@@ -70,6 +110,17 @@ to others.
 </div>
 </p>
 </section>
+
+</div>
+
+<div class="col-md-4">
+<div class="hidden-print hidden-xs hidden-sm affix" role="complementary">
+<ul class="nav">
+    <li><a href="#cycle-optimization">Optimization of array cycles in Lua</a></li>
+    <li><a href="#luarocks-debian">luarocks 2.0.13 for Debian</a></li>
+</ul>
+</div>
+</div>
 
 </div>
 
