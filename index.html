@@ -51,6 +51,43 @@
 
 <div class="col-md-8">
 
+<section class="clearfix" id="bezier-offset">
+<h2>Offsetting cubic Bézier curves</h2>
+<p><small>Sun, 26 Oct 2014 07:57:11 +0100</small></p>
+<p>
+While working on the <a href="http://adg.entidi.com/">ADG</a>, we
+implemented <a href="assets/baioca.pdf">BAIOCA</a>, a new algorithm for
+offsetting Bézier cubic curves. It finds the offset curve by imposing
+some obvious constraint and by minimizing the mean square error between
+the original curve and the offset curve at the <b>same time value</b>.
+</p>
+
+<p>
+<img src="assets/baioca.png" class="img-responsive img-thumbnail">
+</p>
+
+<p>
+By visually inspecting the results, it seems the algorithm performs
+better than <a href="assets/handcraft.pdf">handcraft</a> (the previous
+algorithm) in the edge cases (latest 4 images on the screenshots) but
+overall it performs worse on the other cases (above all, image 2 and 4).
+</p>
+
+<p>
+<img src="assets/handcraft.png" class="img-responsive img-thumbnail">
+</p>
+
+<p>
+I think the algorithm is theoretical correct but the additional phantom
+constraint <q>at the same time value</q> (implied to be able to solve
+the system) must be blamed. This is confirmed by the fact that when
+increasing the samples the offset curve must fit, the quality of the
+result decreases. This counterintuitive behavior makes sense if you
+think that additional phantom constraints worsen the result.
+</p>
+
+</section>
+
 <section class="clearfix" id="cycle-optimization">
 <h2>Optimization of array cycles in Lua</h2>
 <p><small>Sun, 07 Sep 2014 09:35:41 +0200</small></p>
@@ -119,6 +156,7 @@ to others.
 <div class="col-md-4">
 <div class="hidden-print hidden-xs hidden-sm affix" role="complementary">
 <ul class="nav">
+    <li><a href="#bezier-offset">Offsetting cubic Bézier curves</a></li>
     <li><a href="#cycle-optimization">Optimization of array cycles in Lua</a></li>
     <li><a href="#luarocks-debian">luarocks 2.0.13 for Debian</a></li>
 </ul>
