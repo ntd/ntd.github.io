@@ -51,6 +51,103 @@
 
 <div class="col-md-8">
 
+<section class="clearfix" id="mingw-gobject-introspection">
+<h2>Cross-compiling gobject-introspection</h2>
+<p><small>Thu, 26 Mar 2015 08:42:21 +0100</small></p>
+<p>
+The cross compilation of
+<a href="https://wiki.gnome.org/Projects/GObjectIntrospection">gobject-introspection</a>
+from linux to mingw has been proved a really tough task. That project
+seems an octopus connected <b>at runtime</b> to different part of the
+system: python, pkg-config, a shell, dlltool and cc. On a standard unix
+based system all those tools are already installed but when
+cross-compiling you must build every single piece by yourself.
+</p>
+
+<p>
+My first approach was to build everything on the host side (i.e. on
+<a href="http://mingw-w64.yaxm.org/doku.php">mingw-w64</a>). I still
+think this is the correct way (after all I need to add introspection for
+packages installed on the host side) but after a lot of trial and error
+(more errors than trials) I gave up. I was bound continuosly from the
+build side to the host side and vice versa because of path format,
+filename mangling and requirements. When I realized I had to build gcc
+on the host I was fed up. I just tried a
+<a href="https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/">precompiled binary</a>
+and definitively gave up after the umpteenth error.
+</p>
+
+<p>
+The second approach was to leverage the tools on the build system by
+configuring them to work with the paths of the host system. It was not
+straight-forward but surely much more easier than the previous attempt
+and, above all, succesful!
+</p>
+
+<p>
+The main problem was to build the giscanner python module for the build
+platform. I resolved building the project twice, as already done by
+<a href="https://bugzilla.gnome.org/show_bug.cgi?id=592311#c20">Nicolas
+Dufresne</a> when cross-compiling for other arch. I then leveraged
+<a href="https://www.winehq.org/">wine</a> to run host programs on the
+build side.
+</p>
+
+<p>
+The changes on gobject-introspection are relatively few and unobtrusive.
+They can be pulled from my
+<a href="https://github.com/ntd/gobject-introspection/tree/xbuild">xbuild branch</a>.
+</p>
+
+<p>
+The build is still not as straight-forward as I would. I used a
+variation of the following (untested) procedure.
+</p>
+
+<pre>
+export CC=$arch-gcc
+export PKG_CONFIG=$arch-pkg-config
+export DLLTOOL=$arch-dlltool
+export PYTHON=/usr/bin/python2
+export GI_OS_NAME=nt
+export INTROSPECTION_LAUNCHER="/usr/bin/env WINEARCH=win$bits WINEPREFIX=$srcdir/win$bits DISPLAY= /usr/bin/wine"
+export XDG_DATA_DIRS="/usr/$arch/share:$XDG_DATA_DIRS"
+export GI_TYPELIB_PATH="/usr/$arch/lib/girepository-1.0:$GI_TYPELIB_PATH"
+
+# First pass: build the giscanner Python module with build == host
+./configure \
+    --disable-silent-rules \
+    --enable-shared \
+    --enable-static
+make scannerparser.c _giscanner.la
+
+# Second pass: build everything else with build != host (i.e. cross-compile)
+./configure \
+  --build=... \
+  --host=... \
+  --prefix=... \
+  --disable-silent-rules \
+  --enable-shared \
+  --enable-static \
+  --disable-doctool \
+  --disable-giscanner
+
+# Avoid overriding what built in the first pass
+make -t scannerparser.c _giscanner.la
+
+make INTROSPECTION_LAUNCHER="$INTROSPECTION_LAUNCHER"
+</pre>
+
+<p>
+In the real world I built the project on ArchLinux as part of
+<a href="https://github.com/ntd/aur-fedora-mingw">a toolchain</a> for
+cross-compiling GTK+2 and GTK+3 applications. The build script can be
+browsed on its
+<a href="https://github.com/ntd/aur-fedora-mingw/blob/master/afm-mingw-w64-gobject-introspection/PKGBUILD">dedicated PKGBUILD</a>.
+</p>
+
+</section>
+
 <section class="clearfix" id="bezier-offset">
 <h2>Offsetting cubic Bézier curves</h2>
 <p><small>Sun, 26 Oct 2014 07:57:11 +0100</small></p>
@@ -155,6 +252,7 @@ to others.
 <div class="col-md-4">
 <div class="hidden-print hidden-xs hidden-sm affix" role="complementary">
 <ul class="nav">
+    <li><a href="#mingw-gobject-introspection">Cross-compiling gobject-introspection</a></li>
     <li><a href="#bezier-offset">Offsetting cubic Bézier curves</a></li>
     <li><a href="#cycle-optimization">Optimization of array cycles in Lua</a></li>
     <li><a href="#luarocks-debian">luarocks 2.0.13 for Debian</a></li>
